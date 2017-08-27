@@ -1,0 +1,285 @@
+<?xml version="1.0"?>
+<project
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.reactivej</groupId>
+        <artifactId>dcf-parent</artifactId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+    
+    <artifactId>dcf</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <zip.name>${project.name}-${project.version}</zip.name>
+        <zip.path>target/${zip.name}</zip.path>
+        <guava.version>18.0</guava.version>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <config.path>classes</config.path>
+                <home.path>${project.build.directory}</home.path>
+                <!-- 配置 -->
+                <mvn.node.port>9001</mvn.node.port>
+
+                <mvn.leader.host>192.168.1.103</mvn.leader.host>
+                <mvn.leader.port>9002</mvn.leader.port>
+                <mvn.leader.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18001,server=y,suspend=n</mvn.leader.java.debug>
+                <mvn.leader.java.xms>100</mvn.leader.java.xms>
+                <mvn.leader.java.xmx>200</mvn.leader.java.xmx>
+
+                <mvn.worker.port>9003</mvn.worker.port>
+                <mvn.worker.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18002,server=y,suspend=n</mvn.worker.java.debug>
+                <mvn.worker.java.xms>100</mvn.worker.java.xms>
+                <mvn.worker.java.xmx>200</mvn.worker.java.xmx>
+
+
+                <mvn.task.port.min>9005</mvn.task.port.min>
+                <mvn.task.port.max>9999</mvn.task.port.max>
+
+                <mvn.task.debug>true</mvn.task.debug>
+
+                <mvn.acker.host>192.168.1.103</mvn.acker.host>
+                <mvn.acker.port>9004</mvn.acker.port>
+                <mvn.acker.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18004,server=y,suspend=n</mvn.acker.java.debug>
+                <mvn.acker.java.xms>200</mvn.acker.java.xms>
+                <mvn.acker.java.xmx>1000</mvn.acker.java.xmx>
+
+                <mvn.heartbeat.interval>20000</mvn.heartbeat.interval>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>dev_pkg</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <config.path>etc</config.path>
+                <home.path></home.path>
+
+                <!-- 配置 -->
+
+                <mvn.node.port>9001</mvn.node.port>
+
+                <mvn.leader.host>192.168.1.103</mvn.leader.host>
+                <mvn.leader.port>9002</mvn.leader.port>
+                <mvn.leader.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18001,server=y,suspend=n</mvn.leader.java.debug>
+                <mvn.leader.java.xms>100</mvn.leader.java.xms>
+                <mvn.leader.java.xmx>800</mvn.leader.java.xmx>
+
+                <mvn.worker.port>9003</mvn.worker.port>
+                <mvn.worker.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18002,server=y,suspend=n</mvn.worker.java.debug>
+                <mvn.worker.java.xms>100</mvn.worker.java.xms>
+                <mvn.worker.java.xmx>200</mvn.worker.java.xmx>
+
+
+                <mvn.task.port.min>9005</mvn.task.port.min>
+                <mvn.task.port.max>9999</mvn.task.port.max>
+
+                <mvn.task.debug>true</mvn.task.debug>
+
+                <mvn.acker.host>192.168.1.103</mvn.acker.host>
+                <mvn.acker.port>9004</mvn.acker.port>
+                <mvn.acker.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18004,server=y,suspend=n</mvn.acker.java.debug>
+                <mvn.acker.java.xms>200</mvn.acker.java.xms>
+                <mvn.acker.java.xmx>1000</mvn.acker.java.xmx>
+
+                <mvn.heartbeat.interval>20000</mvn.heartbeat.interval>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>io.reactivej.dcf.Main</mainClass>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.9</version>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>${project.basedir}/testng-qa.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                            <argLine>-Dfile.encoding=UTF-8</argLine>
+                            <testFailureIgnore>true</testFailureIgnore>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.4</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>bin</exclude>
+                                <exclude>bin/*</exclude>
+                                <exclude>logback.xml</exclude>
+                                <exclude>config.properties</exclude>
+                                <exclude>META-INF/applicationContext*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.1</version>
+                        <executions>
+                            <execution>
+                                <id>copy-dependencies</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/${zip.path}/lib</outputDirectory>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>false</overWriteSnapshots>
+                                    <overWriteIfNewer>true</overWriteIfNewer>
+                                    <excludeArtifactIds>ant,ant-contrib</excludeArtifactIds>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.3</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${basedir}/${zip.path}/lib</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                    <followSymlinks>false</followSymlinks>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <id>package_tester</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="${zip.path}" />
+                                        <mkdir dir="${zip.path}/etc" />
+                                        <mkdir dir="${zip.path}/bin" />
+                                        <move todir="${zip.path}/bin">
+                                            <fileset dir="target/classes/bin">
+                                                <include name="**/*" />
+                                                <exclude name="**/.svn" />
+                                            </fileset>
+                                        </move>
+                                        <move file="target/${project.name}-${project.version}.jar"
+                                              toFile="${zip.path}/lib/${project.name}-${project.version}.jar" overwrite="true" />
+                                        <copy todir="${zip.path}/etc">
+                                            <fileset dir="target/classes">
+                                                <include name="logback.xml" />
+                                                <include name="config.properties" />
+                                                <include name="META-INF/applicationContext*" />
+                                            </fileset>
+                                        </copy>
+                                        <!-- 压缩打包 -->
+                                        <war needxmlfile="false" encoding="utf-8" warfile="target/${zip.name}.zip"
+                                             basedir="${zip.path}">
+                                            <include name="*" />
+                                            <include name="**/*.*" />
+                                        </war>
+                                        <delete file="target/${project.name}-${project.version}.jar" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivej</groupId>
+            <artifactId>dcf-common</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>io.reactivej</groupId>
+            <artifactId>dcf-component</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

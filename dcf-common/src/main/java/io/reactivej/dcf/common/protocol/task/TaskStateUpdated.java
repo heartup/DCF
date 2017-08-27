@@ -1,0 +1,28 @@
+package io.reactivej.dcf.common.protocol.task;
+
+import com.google.common.base.MoreObjects;
+import io.reactivej.dcf.common.info.TaskInfo;
+
+import java.io.Serializable;
+
+/**
+ * @author heartup@gmail.com on 8/20/16.
+ */
+public class TaskStateUpdated implements Serializable {
+    private final TaskInfo taskInfo;
+
+    public TaskStateUpdated(TaskInfo info) {
+        this.taskInfo = info;
+    }
+
+    public TaskInfo getTaskInfo() {
+        return taskInfo;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("taskInfo", taskInfo)
+                .toString();
+    }
+}

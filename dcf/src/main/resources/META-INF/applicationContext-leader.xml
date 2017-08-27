@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:property-placeholder location="classpath:config.properties"
+								  ignore-unresolvable="true" />
+
+	<bean id="system" class="io.reactivej.ConfigReactiveSystem" init-method="init">
+		<property name="port" value="#{systemProperties['SYSTEM_PORT']}"/>
+		<property name="config">
+			<map>
+				<entry key="children">
+					<map>
+						<entry key="leader">
+							<map>
+								<entry key="singleton" value="true" />
+								<entry key="dispatcher" value="global"/>
+								<entry key="class" value="io.reactivej.dcf.leader.ReactiveLeader"/>
+							</map>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+
+		<property name="clusterConfig">
+			<map>
+				<entry key="name" value="reactive" />
+				<entry key="singletons">
+					<map>
+						<entry key="leader">
+							<map>
+								<entry key="host" value="${leader.host}" />
+								<entry key="port" value="${leader.port}"/>
+							</map>
+						</entry>
+						<entry key="acker">
+							<map>
+								<entry key="host" value="${acker.host}" />
+								<entry key="port" value="${acker.port}"/>
+							</map>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+
+		<property name="rootComponentClass" value="io.reactivej.dcf.leader.LeaderSupervisor"/>
+	</bean>
+
+	<bean id="leader" class="io.reactivej.dcf.common.factory.ReactiveComponentFactory" factory-method="createComponent" >
+		<constructor-arg index="0" ref="system"/>
+		<constructor-arg index="1" value="leader"/>
+	</bean>
+
+</beans>

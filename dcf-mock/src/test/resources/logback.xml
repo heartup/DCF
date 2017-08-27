@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+    <appender name="subproc" class="ch.qos.logback.core.ConsoleAppender">
+        <encoding>UTF-8</encoding>
+        <encoder>
+            <pattern>%m%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="process" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoding>UTF-8</encoding>
+        <File>logs/${dcf.process}.log</File>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-22property{dcf.process}] %-5p %-28c{0} %X{ServiceId} - %m%n</pattern>
+        </layout>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>10</maxIndex>
+            <FileNamePattern>logs/${dcf.process}.log.%i</FileNamePattern>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>500MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <appender name="all" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoding>UTF-8</encoding>
+        <File>logs/all.log</File>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-22property{dcf.process}] %-5p %-28c{0} %X{ServiceId} - %m%n</pattern>
+        </layout>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <maxIndex>10</maxIndex>
+            <FileNamePattern>logs/all.log.%i</FileNamePattern>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>500MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoding>UTF-8</encoding>
+        <encoder>
+            <pattern>%d{yy-MM-dd.HH:mm:ss.SSS} [%-22thread] %-5p %-28c{0} %X{ServiceId} - %m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="org.apache.zookeeper" level="info"/>
+    <logger name="com.jdjr" level="info" />
+    <logger name="io.netty" level="inf" />
+    <logger name="subproc" additivity="false" level="info">
+        <appender-ref ref="subproc"/>
+    </logger>
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="process"/>
+        <appender-ref ref="all"/>
+    </root>
+</configuration>
