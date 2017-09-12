@@ -100,7 +100,7 @@ public class TaskManagerMock extends ReactiveComponent {
         config.put(ReactiveSystem.CONFIG_CHILDREN, childrenConfig);
         sys.setConfig(config);
 
-        sys.createReactiveComponent("task");
+        sys.createReactiveComponent("task", true, ReactiveTask.class.getName(), Integer.toString(getContext().getSystem().getPort()), Long.toString(taskId), null);
 
         return sys;
     }
