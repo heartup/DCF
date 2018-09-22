@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.reactivej</groupId>
         <artifactId>dcf-parent</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
     <artifactId>dcf-common</artifactId>
     <packaging>jar</packaging>
