@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @Description: 数据块的数据项定义，每个数据块包含多个数据项（Field）
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian
  * 
  * @date: 2015年8月11日 下午2:02:01
  */

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lhh on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class AckerState implements Serializable {
 

@@ -15,7 +15,7 @@ import java.util.Map;
  * @Description: 一个拓扑结构包含DAG、并行度和参数 持久化到ZK
  * 包含调度信息
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian
  * 
  * @date: 2015年8月20日 下午10:04:42
  */

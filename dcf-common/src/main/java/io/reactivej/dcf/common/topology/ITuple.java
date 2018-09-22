@@ -10,7 +10,7 @@ import java.util.List;
  * 
  * @Description: 包含拓扑信息的数据块接口 节点和节点间传输的数据块 该数据块是最小粒度 一个数据块和一个Fields能运算出所需要的数据
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian， heartup@gmail.com
  * 
  * @date: 2015年8月11日 下午3:03:14
  */

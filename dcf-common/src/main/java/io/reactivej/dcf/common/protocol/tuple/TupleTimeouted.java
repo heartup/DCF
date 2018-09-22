@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Root Tuple最终超时而没有被处理
  *
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class TupleTimeouted implements Serializable {
 

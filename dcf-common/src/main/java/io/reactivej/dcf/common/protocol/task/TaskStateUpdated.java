@@ -6,7 +6,7 @@ import io.reactivej.dcf.common.info.TaskInfo;
 import java.io.Serializable;
 
 /**
- * @author heartup@gmail.com on 8/20/16.
+ * Created by heartup@gmail.com on 8/20/16.
  */
 public class TaskStateUpdated implements Serializable {
     private final TaskInfo taskInfo;

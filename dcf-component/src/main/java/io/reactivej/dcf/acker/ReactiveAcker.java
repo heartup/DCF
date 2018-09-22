@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lhh on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class ReactiveAcker extends ReactiveComponent implements IAcker {
     private static Logger logger = LoggerFactory.getLogger(ReactiveAcker.class);

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by lhh on 4/5/16.
+ * Created by heartup@gmail.com on 4/5/16.
  */
 public class AckerInfo implements Serializable {
     private long memoryMax;

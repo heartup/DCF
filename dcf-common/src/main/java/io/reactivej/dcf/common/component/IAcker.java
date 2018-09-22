@@ -6,7 +6,7 @@ import io.reactivej.dcf.common.protocol.tuple.FailTuple;
 import io.reactivej.dcf.common.protocol.tuple.SubmitTuple;
 
 /**
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public interface IAcker {
 

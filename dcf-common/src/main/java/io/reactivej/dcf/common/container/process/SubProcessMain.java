@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * 子进程引导主类
- * 
+ *
  * @author heartup@gmail.com
  * 
  */
@@ -36,6 +36,18 @@ public class SubProcessMain {
 		} catch (Throwable e) {
 			logger.warn("启动子进程时发生未知异常", e);
 		}
+	}
+
+	public static Object getBean(String beanName) {
+		while (springContainer == null) {
+			// 说明容器还没有初始化完成，因此需要等待
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				logger.warn("", e);
+			}
+		}
+		return springContainer.getBean(beanName);
 	}
 
 }

@@ -19,7 +19,7 @@ import java.util.Map;
  * DAG由Emitter和Gear组成，每个Emitter或Gear有若干输出Stream，Emitter或Gear通过Stream将数据输出或传入DAG下一个节点
  * 每个Emitter和Gear可以通过inputstream属性获知其所需处理的数据是从哪个Emitter或Gear的那条Stream传入的
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
  * 
  * @date: 2015年8月12日 下午7:03:49
  */

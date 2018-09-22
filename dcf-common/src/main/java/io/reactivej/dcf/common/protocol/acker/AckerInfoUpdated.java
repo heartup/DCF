@@ -5,7 +5,7 @@ import io.reactivej.dcf.common.info.AckerInfo;
 import java.io.Serializable;
 
 /***
- * @author wylihuanhuan1
+ * @author heartup@gmail.com
  */
 public class AckerInfoUpdated implements Serializable {
 

@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * 此Tuple被处理完毕
  *
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class TupleProcessed implements Serializable {
 

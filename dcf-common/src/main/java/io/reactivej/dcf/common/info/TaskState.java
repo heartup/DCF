@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /***
- * @author wylihuanhuan1
+ * @author heartup@gmail.com
  */
 public class TaskState implements Serializable {
 

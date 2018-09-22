@@ -6,7 +6,7 @@ import io.reactivej.SystemMessage;
 import java.io.Serializable;
 
 /**
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class SuspendTuple extends SystemMessage {
 

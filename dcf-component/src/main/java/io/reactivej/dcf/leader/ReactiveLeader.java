@@ -31,7 +31,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.*;
 
 /**
- * Created by lhh on 4/1/16.
+ * Created by heartup@gmail.com on 4/1/16.
  */
 public class ReactiveLeader extends PersistentReactiveComponent implements ILeader {
 

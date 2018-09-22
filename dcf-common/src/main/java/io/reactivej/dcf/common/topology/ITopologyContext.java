@@ -16,7 +16,7 @@ import io.reactivej.dcf.common.topology.ITuple;
  * 
  * 同时提供控制（请求停止）Topology的功能
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
  * 
  * @date: 2015年8月10日 下午8:25:37
  */

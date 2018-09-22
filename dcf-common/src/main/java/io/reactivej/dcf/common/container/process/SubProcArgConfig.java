@@ -3,7 +3,7 @@ package io.reactivej.dcf.common.container.process;
 /**
  * 子进程自定义参数
  * 通过java -Ddcf.argname=argvalue 方式传入
- * @author heartup@gmail.com
+ * @author wangyilin
  *
  */
 public class SubProcArgConfig {

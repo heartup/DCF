@@ -10,7 +10,7 @@ import java.util.UUID;
 
  * @Description: 消息id
 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian
 
  * @date: 2015年8月11日 下午3:04:43
  */

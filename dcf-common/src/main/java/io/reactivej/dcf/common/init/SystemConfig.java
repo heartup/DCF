@@ -31,6 +31,7 @@ public class SystemConfig {
 
     public static final String node_port = "node.port";
 
+    public static final String leader_host = "leader.host";
     public static final String leader_port = "leader.port";
     public static final String leader_java_debug = "leader.java.debug";
     public static final String leader_java_xms = "leader.java.xms";
@@ -46,6 +47,7 @@ public class SystemConfig {
     public static final String task_port_max = "task.port.max";
     public static final String task_debug = "task.debug";
 
+    public static final String acker_host = "acker.host";
     public static final String acker_port = "acker.port";
     public static final String acker_java_debug = "acker.java.debug";
     public static final String acker_java_xms = "acker.java.xms";

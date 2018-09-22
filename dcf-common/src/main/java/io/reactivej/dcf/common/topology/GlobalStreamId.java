@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 
  * @Description: 全局流id 一个流可以用componentId + streamId 唯一定义一条输入到该component的流
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian
  * 
  * @date: 2015年8月11日 下午3:14:02
  */

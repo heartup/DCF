@@ -14,7 +14,7 @@ import java.util.Map;
  * 一个Component对应一个DAGContext
  * 持久化到ZK
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
  * 
  * @date: 2015年8月10日 下午7:52:28
  */

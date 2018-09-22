@@ -3,7 +3,7 @@ package io.reactivej.dcf.common.protocol.acker;
 import java.io.Serializable;
 
 /***
- * @author wylihuanhuan1
+ * @author heartup@gmail.com
  */
 public class SetAckerMonitor implements Serializable {
 }

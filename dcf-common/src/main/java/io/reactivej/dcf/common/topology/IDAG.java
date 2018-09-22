@@ -9,7 +9,7 @@ import java.util.Map;
 
  * @Description: Job拓扑结构的有向无环图描述
 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
 
  * @date: 2015年8月10日 下午7:13:55
  */

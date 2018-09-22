@@ -4,7 +4,7 @@ import io.reactivej.ReactiveRef;
 import io.reactivej.ReactiveSystem;
 
 /**
- * @author heartup@gmail.com on 4/11/16.
+ * Created by heartup@gmail.com on 4/11/16.
  */
 public class ReactiveComponentFactory {
 

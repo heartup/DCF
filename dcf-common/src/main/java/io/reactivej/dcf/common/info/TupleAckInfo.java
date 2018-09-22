@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by lhh on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class TupleAckInfo implements Serializable {
 

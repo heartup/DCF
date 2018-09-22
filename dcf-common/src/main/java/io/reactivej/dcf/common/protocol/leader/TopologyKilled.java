@@ -1,20 +1,29 @@
 package io.reactivej.dcf.common.protocol.leader;
 
+import io.reactivej.dcf.common.info.TaskInfo;
+import io.reactivej.dcf.common.topology.GlobalTopologyId;
 import io.reactivej.dcf.common.topology.Topology;
 
 import java.io.Serializable;
+import java.util.List;
 
 /***
  * @author heartup@gmail.com
  */
 public class TopologyKilled implements Serializable {
-    private final Topology topology;
+    private final List<TaskInfo> topologyTasks;
+    private final GlobalTopologyId topologyId;
 
-    public TopologyKilled(Topology topology) {
-        this.topology = topology;
+    public TopologyKilled(GlobalTopologyId topologyId, List<TaskInfo> topologyTasks) {
+        this.topologyId = topologyId;
+        this.topologyTasks = topologyTasks;
     }
 
-    public Topology getTopology() {
-        return topology;
+    public GlobalTopologyId getTopologyId() {
+        return topologyId;
+    }
+
+    public List<TaskInfo> getTopologyTasks() {
+        return topologyTasks;
     }
 }

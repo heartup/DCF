@@ -4,7 +4,7 @@ import com.google.common.base.MoreObjects;
 import io.reactivej.SystemMessage;
 
 /**
- * @author heartup@gmail.com on 8/20/16.
+ * Created by heartup@gmail.com on 8/20/16.
  */
 public class UpdateLeaderInfo extends SystemMessage {
     @Override

@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Root Tuple的Fail操作处理完毕
  *
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class TupleFailed implements Serializable {
 

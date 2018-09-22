@@ -12,7 +12,7 @@ import java.util.Map;
  * DAGContext：计算逻辑可以通过此对象获取自己在整个计算逻辑中的位置
  * conf: 计算逻辑的配置参数
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
  *
  * @date: 2015年8月10日 下午7:37:43
  */

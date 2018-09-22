@@ -4,7 +4,7 @@ import com.google.common.base.MoreObjects;
 import io.reactivej.SystemMessage;
 
 /**
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public class ResumeTuple extends SystemMessage {
 

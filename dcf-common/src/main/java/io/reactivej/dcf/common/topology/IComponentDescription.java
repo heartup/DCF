@@ -16,7 +16,7 @@ import java.util.Map;
  * (componentId,streamId)             streamId
  * ————————--------------> component ———----->
 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian, heartup@gmail.com
 
  * @date: 2015年8月11日 上午9:44:37
  */

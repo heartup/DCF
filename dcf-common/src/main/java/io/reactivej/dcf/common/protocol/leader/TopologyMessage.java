@@ -6,7 +6,7 @@ import io.reactivej.dcf.common.topology.GlobalTopologyId;
 import java.io.Serializable;
 
 /**
- * @author heartup@gmail.com on 11/18/16.
+ * Created by heartup@gmail.com on 11/18/16.
  */
 public class TopologyMessage implements Serializable {
     private final GlobalTopologyId topologyId;
