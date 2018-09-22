@@ -33,7 +33,7 @@ import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 
 /**
- * @author heartup@gmail.com on 4/1/16.
+ * Created by lhh on 4/1/16.
  */
 public class ReactiveWorker extends PersistentReactiveComponent implements IWorker {
 
@@ -196,7 +196,7 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
         heartbeatMsg.setTasks(tasks);
 
         clusterClient.tell(new ClusterClient.ClusterMessage("leader",
-                        heartbeatMsg), getSelf());
+                heartbeatMsg), getSelf());
 
         if (getMonitor() != null) {
             getMonitor().tell(new WorkerStateUpdated(state), getSelf());
@@ -210,8 +210,8 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
 
         boolean shouldKill = true;
         for (List<Long> ts : state.getLocalTopologyTasks().values()) {
-           if (ts.contains(info.getTaskId()))
-               shouldKill = false;
+            if (ts.contains(info.getTaskId()))
+                shouldKill = false;
         }
 
         if (shouldKill) {
@@ -231,16 +231,36 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
 
     public void onTaskKilled(TaskKilled msg) {
         long taskId = msg.getTaskId();
-        TaskInfo taskInfo = state.getTasks().get(taskId);
+        TaskInfo taskInfo = state.getTasks().remove(taskId);
         taskInfo.setStatus(TaskInfo.TaskStatus.KILLED);
+        state.getLocalTasks().remove(taskId);
+
+        GlobalTopologyId topoId = taskInfo.getTopologyId();
+        state.getLocalTopologyTasks().get(topoId).remove(taskId);
+        if (state.getLocalTopologyTasks().get(topoId).size() == 0) {
+            state.getLocalTopologyTasks().remove(topoId);
+            state.getTopologyTasks().remove(topoId);
+            state.getTopologys().remove(topoId);
+        }
+
         clusterClient.tell(new ClusterClient.ClusterMessage("leader",
                 msg), getSelf());
     }
 
     public void onTaskFinished(TaskFinished msg) {
         long taskId = msg.getTaskId();
-        TaskInfo taskInfo = state.getTasks().get(taskId);
+        TaskInfo taskInfo = state.getTasks().remove(taskId);
         taskInfo.setStatus(TaskInfo.TaskStatus.FINISHED);
+        state.getLocalTasks().remove(taskId);
+
+        GlobalTopologyId topoId = taskInfo.getTopologyId();
+        state.getLocalTopologyTasks().get(topoId).remove(taskId);
+        if (state.getLocalTopologyTasks().get(topoId).size() == 0) {
+            state.getLocalTopologyTasks().remove(topoId);
+            state.getTopologyTasks().remove(topoId);
+            state.getTopologys().remove(topoId);
+        }
+
         clusterClient.tell(new ClusterClient.ClusterMessage("leader",
                 msg), getSelf());
     }
@@ -258,7 +278,7 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
     }
 
     public void onFinishTopology(FinishTopology cmd) {
-        List<Long> tasks = state.getTopologyTasks().get(cmd.getTopologyId());
+        List<Long> tasks = state.getLocalTopologyTasks().get(cmd.getTopologyId());
         for (Long taskId : tasks) {
             getTaskEndpoint(taskId).tell(new FinishTask(taskId, cmd.getResult()), getSelf());
         }
@@ -274,7 +294,10 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
     }
 
     public void onKillTopology(KillTopology cmd) {
-        List<Long> tasks = state.getTopologyTasks().get(cmd.getTopologyId());
+        List<Long> tasks = state.getLocalTopologyTasks().get(cmd.getTopologyId());
+        if (tasks == null)
+            return;
+
         for (Long taskId : tasks) {
             killTask(state.getTasks().get(taskId));
         }
