@@ -1,28 +1,61 @@
 package io.reactivej.dcf.acker;
 
 import io.reactivej.dcf.common.component.IAcker;
+import io.reactivej.dcf.common.info.AckerInfo;
 import io.reactivej.dcf.common.info.AckerState;
+import io.reactivej.dcf.common.info.LeaderInfo;
 import io.reactivej.dcf.common.info.TupleAckInfo;
-import io.reactivej.dcf.common.protocol.leader.TopologyFinished;
-import io.reactivej.dcf.common.protocol.leader.TopologyKilled;
+import io.reactivej.dcf.common.init.SystemConfig;
+import io.reactivej.dcf.common.protocol.acker.*;
+import io.reactivej.dcf.common.protocol.leader.*;
 import io.reactivej.dcf.common.protocol.tuple.*;
 import io.reactivej.AbstractComponentBehavior;
 import io.reactivej.ReactiveComponent;
+import io.reactivej.ReactiveRef;
 import io.reactivej.dcf.common.topology.GlobalTopologyId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author heartup@gmail.com on 8/7/16.
+ * Created by lhh on 8/7/16.
  */
 public class ReactiveAcker extends ReactiveComponent implements IAcker {
     private static Logger logger = LoggerFactory.getLogger(ReactiveAcker.class);
 
     private AckerState state = new AckerState();
+
+    private ReactiveRef ackerMonitor;
+
+    @Override
+    public void preStart() {
+        super.preStart();
+
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        long startTime = runtimeMXBean.getStartTime();
+        String name = runtimeMXBean.getName();
+        Integer pid = Integer.valueOf(name.split("@")[0]);
+        Runtime rt = Runtime.getRuntime();
+        long totalMemory = rt.totalMemory();
+        long freeMemory = rt.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+
+        AckerInfo ackerInfo = state.getAckerInfo();
+        ackerInfo.setLastHeartbeat(new Date().getTime());
+        ackerInfo.setMemoryMax(rt.maxMemory());
+        ackerInfo.setMemoryUsed(usedMemory);
+        ackerInfo.setPid(pid);
+        ackerInfo.setStartTime(startTime);
+
+        int heartbeatInterval = SystemConfig.getIntValue(SystemConfig.heartbeat_interval);
+        getContext().getSystem().getScheduler().schedule(0, heartbeatInterval, getSelf(), new UpdateAckerInfo(), null);
+    }
 
     @Override
     public AbstractComponentBehavior getDefaultBehavior() {
@@ -41,19 +74,58 @@ public class ReactiveAcker extends ReactiveComponent implements IAcker {
                     onTopologyKilled((TopologyKilled) msg);
                 } else if (msg instanceof TopologyFinished) {
                     onTopologyFinished((TopologyFinished) msg);
+                } else if (msg instanceof UpdateAckerInfo) {
+                    onUpdateAckerInfo((UpdateAckerInfo) msg);
+                } else if (msg instanceof SetAckerMonitor) {
+                    onSetAckerMonitor((SetAckerMonitor) msg);
+                } else if (msg instanceof RemoveAckerMonitor) {
+                    onRemoveAckerMonitor((RemoveAckerMonitor) msg);
+                } else if (msg instanceof RemoveAckerTopology) {
+                    onRemoveAckerTopology((RemoveAckerTopology) msg);
                 }
             }
         };
     }
 
+    private void onUpdateAckerInfo(UpdateAckerInfo msg) {
+        ackerInfoUpdated();
+    }
+
+    private void ackerInfoUpdated() {
+        Runtime rt = Runtime.getRuntime();
+        long totalMemory = rt.totalMemory();
+        long freeMemory = rt.freeMemory();
+        long usedMemory = totalMemory - freeMemory;
+        AckerInfo info = state.getAckerInfo();
+        info.setMemoryUsed(usedMemory);
+        info.getPendingAckTupleCounts().clear();
+        for (Map.Entry<GlobalTopologyId, Map<Serializable, TupleAckInfo>> e : state.getTopologyAckInfos().entrySet()) {
+            GlobalTopologyId key = e.getKey();
+            Long size = Long.valueOf(e.getValue().size());
+            info.getPendingAckTupleCounts().put(key, size);
+        }
+
+        if (getAckerMonitor() != null) {
+            getAckerMonitor().tell(new AckerInfoUpdated(info), getSelf());
+        }
+    }
+
     private void onTopologyFinished(TopologyFinished msg) {
-        GlobalTopologyId id = msg.getTopology().getTopologyId();
+        GlobalTopologyId id = msg.getTopologyId();
         removeTopologyInfo(id);
+        ackerInfoUpdated();
     }
 
     private void onTopologyKilled(TopologyKilled msg) {
-        GlobalTopologyId id = msg.getTopology().getTopologyId();
+        GlobalTopologyId id = msg.getTopologyId();
         removeTopologyInfo(id);
+        ackerInfoUpdated();
+    }
+
+    private void onRemoveAckerTopology(RemoveAckerTopology msg) {
+        GlobalTopologyId id = msg.getTopologyId();
+        removeTopologyInfo(id);
+        ackerInfoUpdated();
     }
 
     private void removeTopologyInfo(GlobalTopologyId topologyId) {
@@ -173,5 +245,22 @@ public class ReactiveAcker extends ReactiveComponent implements IAcker {
             // 从acker传到emitter的FailTuple不需要指定rootIds，从task传到acker的消息才需要rootIds
             ackInfo.getEmitterTask().tell(new FailTuple(ackInfo.getTopologyId(), null, ackInfo.getTuple(), ackInfo.getFailCause()), getSelf());
         }
+    }
+
+    private void onSetAckerMonitor(SetAckerMonitor cmd) {
+        setAckerMonitor(getSender());
+        getAckerMonitor().tell(new AckerInfoUpdated(state.getAckerInfo()), getSelf());
+    }
+
+    private void onRemoveAckerMonitor(RemoveAckerMonitor cmd) {
+        setAckerMonitor(null);
+    }
+
+    public ReactiveRef getAckerMonitor() {
+        return ackerMonitor;
+    }
+
+    public void setAckerMonitor(ReactiveRef ackerMonitor) {
+        this.ackerMonitor = ackerMonitor;
     }
 }

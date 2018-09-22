@@ -1,24 +1,24 @@
 package io.reactivej.dcf.common.info;
 
-import com.google.common.base.MoreObjects;
-import io.reactivej.ReactiveRef;
+import io.reactivej.dcf.common.topology.GlobalTopologyId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by lhh on 4/5/16.
  */
-public class LeaderInfo implements Serializable {
+public class AckerInfo implements Serializable {
     private long memoryMax;
     private long memoryUsed;
     private int pid;
     private long startTime;
+    private Map<GlobalTopologyId, Long> pendingAckTupleCounts = new HashMap<>();
 
     private transient long lastHeartbeat;
 
-    public LeaderInfo() {}
+    public AckerInfo() {}
 
     public long getMemoryMax() {
         return memoryMax;
@@ -52,6 +52,14 @@ public class LeaderInfo implements Serializable {
         this.startTime = startTime;
     }
 
+    public Map<GlobalTopologyId, Long> getPendingAckTupleCounts() {
+        return pendingAckTupleCounts;
+    }
+
+    public void setPendingAckTupleCounts(Map<GlobalTopologyId, Long> pendingAckTupleCounts) {
+        this.pendingAckTupleCounts = pendingAckTupleCounts;
+    }
+
     public long getLastHeartbeat() {
         return lastHeartbeat;
     }
@@ -62,11 +70,12 @@ public class LeaderInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "LeaderInfo{" +
+        return "AckerInfo{" +
                 "memoryMax=" + memoryMax +
                 ", memoryUsed=" + memoryUsed +
                 ", pid=" + pid +
                 ", startTime=" + startTime +
+                ", pendingAckTupleCounts=" + pendingAckTupleCounts +
                 ", lastHeartbeat=" + lastHeartbeat +
                 '}';
     }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author heartup@gmail.com on 4/1/16.
+ * Created by lhh on 4/1/16.
  */
 public class LeaderState implements Serializable {
 
@@ -74,11 +74,11 @@ public class LeaderState implements Serializable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("workers", workers)
-                .add("topologys", topologys)
-                .add("tasks", tasks)
-                .add("schedule", schedule)
-                .add("leaderInfo", leaderInfo)
+                .add("workers", "...")
+                .add("topologys", "...")
+                .add("tasks", "...")
+                .add("schedule", "...")
+                .add("leaderInfo", "...")
                 .add("lastTaskId", lastTaskId)
                 .toString();
     }

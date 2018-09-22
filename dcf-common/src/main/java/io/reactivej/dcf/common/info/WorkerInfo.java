@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author heartup@gmail.com on 4/5/16.
+ * Created by lhh on 4/5/16.
  */
 public class WorkerInfo implements Serializable {
 

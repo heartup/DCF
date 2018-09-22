@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * @author heartup@gmail.com on 4/1/16.
+ * Created by lhh on 4/1/16.
  */
 public class TaskInfo implements Serializable {
     public static enum TaskStatus {
