@@ -1,5 +1,6 @@
 package io.reactivej.dcf.leader;
 
+import com.google.common.collect.Lists;
 import io.reactivej.dcf.common.component.ILeader;
 import io.reactivej.dcf.common.info.*;
 import io.reactivej.dcf.common.init.SystemConfig;
@@ -30,7 +31,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.*;
 
 /**
- * @author heartup@gmail.com on 4/1/16.
+ * Created by lhh on 4/1/16.
  */
 public class ReactiveLeader extends PersistentReactiveComponent implements ILeader {
 
@@ -139,6 +140,8 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
                     onTopologyMessage((TopologyMessage) cmd);
                 } else if (cmd instanceof UpdateLeaderInfo) {
                     onUpdateLeaderInfo((UpdateLeaderInfo) cmd);
+                } else if (cmd instanceof ResetLeader) {
+                    onResetLeader();
                 }
             }
         };
@@ -169,9 +172,12 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
     }
 
     private void onRemoveTopologyMonitor(RemoveTopologyMonitor cmd) {
-        this.monitoringTasks.removeAll(state.getSchedule().getSchedules().get(cmd.getId()));
-        if (this.monitoringTasks.isEmpty()) {
-            setTaskMonitor(null);
+        List<Long> taskIds = state.getSchedule().getSchedules().get(cmd.getId());
+        if (taskIds != null) {
+            this.monitoringTasks.removeAll(taskIds);
+            if (this.monitoringTasks.isEmpty()) {
+                setTaskMonitor(null);
+            }
         }
     }
 
@@ -185,12 +191,12 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
     }
 
     private void onSetLeaderMonitor(SetLeaderMonitor cmd) {
-        leaderMonitor = getSender();
-        leaderMonitor.tell(new LeaderStateUpdated(state), getSelf());
+        setLeaderMonitor(getSender());
+        getLeaderMonitor().tell(new LeaderStateUpdated(state), getSelf());
     }
 
     private void onRemoveLeaderMonitor(RemoveLeaderMonitor cmd) {
-        leaderMonitor = null;
+        setLeaderMonitor(null);
     }
 
     private void onCheckTimeout(CheckTimeout cmd) {
@@ -204,20 +210,20 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
             }
         }
 
-        for (TaskInfo task : state.getTasks().values()) {
-            if (task.getStatus().ordinal() <= TaskInfo.TaskStatus.STARTED.ordinal()) {
-                if (curTime - task.getLastHeartbeat() > timeout) {
-                    disconnectTask(task);
-                }
-                else {
-                    // 如果worker断开了连接，task也要disconnect
-                    WorkerInfo worker = state.getWorkers().get(task.getLocation().getWorkerId());
-                    if (worker.getStatus() != WorkerInfo.WorkerStatus.REGISTERED) {
-                        disconnectTask(task);
-                    }
-                }
-            }
-        }
+//        for (TaskInfo task : state.getTasks().values()) {
+//            if (task.getStatus().ordinal() <= TaskInfo.TaskStatus.STARTED.ordinal()) {
+//                if (curTime - task.getLastHeartbeat() > timeout) {
+//                    disconnectTask(task);
+//                }
+//                else {
+//                    // 如果worker断开了连接，task也要disconnect
+//                    WorkerInfo worker = state.getWorkers().get(task.getLocation().getWorkerId());
+//                    if (worker.getStatus() != WorkerInfo.WorkerStatus.REGISTERED) {
+//                        disconnectTask(task);
+//                    }
+//                }
+//            }
+//        }
     }
 
     private void disconnectTask(TaskInfo task) {
@@ -369,6 +375,10 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
         if (taskIds != null) {
             for (Long taskId : taskIds) {
                 TaskInfo taskInfo = state.getTasks().get(taskId);
+                if (taskInfo.getStatus() == TaskInfo.TaskStatus.FINISHED ||
+                        taskInfo.getStatus() == TaskInfo.TaskStatus.KILLED)
+                    continue;
+
                 if (!workers.contains(taskInfo.getLocation().getWorkerId()))
                     workers.add(taskInfo.getLocation().getWorkerId());
             }
@@ -412,37 +422,39 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
         }
     }
 
-    private Topology removeTopologyInfo(final GlobalTopologyId topologyId) {
-//        Topology topology = state.getTopologys().remove(topologyId);
-//        List<Long> tasks = state.getSchedule().getSchedules().remove(topologyId);
-//        if (tasks != null) {
-//            for (Long taskId : tasks) {
-//                state.getTasks().remove(taskId);
-//            }
-//        }
+    private List<TaskInfo> removeTopologyInfo(final GlobalTopologyId topologyId) {
+        List<TaskInfo> hisTasks = new ArrayList<>();
 
-//        return topology;
+        Topology topology = state.getTopologys().remove(topologyId);
+        List<Long> tasks = state.getSchedule().getSchedules().remove(topologyId);
+        if (tasks != null) {
+            this.monitoringTasks.removeAll(tasks);
 
-        return state.getTopologys().get(topologyId);
+            for (Long taskId : tasks) {
+                TaskInfo taskInfo = state.getTasks().remove(taskId);
+                if (taskInfo != null) {
+                    hisTasks.add(taskInfo);
+                }
+            }
+        }
+
+        return hisTasks;
     }
 
     private void killTopology(final GlobalTopologyId topologyId) {
-        final Topology topology = removeTopologyInfo(topologyId);
-        if (topology == null)
+        final List<TaskInfo> hisTasks = removeTopologyInfo(topologyId);
+        if (hisTasks.size() == 0)
             return;
-
-        topology.setState(Topology.TopologyState.KILLED);
 
         takeSnapshot(state, new Procedure<Serializable>() {
             @Override
             public void apply(Serializable param) throws Exception {
-                getClusterClient().tell(new ClusterClient.ClusterMessage("acker", new TopologyKilled(topology)), getSelf());
+                getClusterClient().tell(new ClusterClient.ClusterMessage("acker", new TopologyKilled(topologyId, hisTasks)), getSelf());
 
                 if (getClientRef() != null) {
-                    getClientRef().tell(new TopologyKilled(topology), getSelf());
+                    getClientRef().tell(new TopologyKilled(topologyId, hisTasks), getSelf());
                 }
                 if (getLeaderMonitor() != null) {
-                    getLeaderMonitor().tell(new TopologyKilled(topology), getSelf());
                     getLeaderMonitor().tell(new LeaderStateUpdated(state), getSelf());
                 }
             }
@@ -458,19 +470,17 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
         }
 
         if (isTopologyFinished(taskInfo.getTopologyId())) {
-            final Topology topology = removeTopologyInfo(taskInfo.getTopologyId());
-            if (topology == null)
+            final List<TaskInfo> hisTasks = removeTopologyInfo(taskInfo.getTopologyId());
+            if (hisTasks == null)
                 return;
-
-            topology.setState(Topology.TopologyState.FINISHED);
 
             takeSnapshot(state, new Procedure<Serializable>() {
                 @Override
                 public void apply(Serializable param) throws Exception {
-                    getClusterClient().tell(new ClusterClient.ClusterMessage("acker", new TopologyFinished(topology, cmd.getResult())), getSelf());
+                    getClusterClient().tell(new ClusterClient.ClusterMessage("acker", new TopologyFinished(taskInfo.getTopologyId(), hisTasks, cmd.getResult())), getSelf());
 
                     if (getClientRef() != null) {
-                        getClientRef().tell(new TopologyFinished(topology, cmd.getResult()), getSelf());
+                        getClientRef().tell(new TopologyFinished(taskInfo.getTopologyId(), hisTasks, cmd.getResult()), getSelf());
                     }
                     if (getLeaderMonitor() != null) {
                         getLeaderMonitor().tell(new LeaderStateUpdated(state), getSelf());
@@ -503,6 +513,17 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
     }
 
     public void onKillTopology(KillTopology cmd) {
+        List<Long> taskIds = state.getSchedule().getSchedules().get(cmd.getTopologyId());
+
+        if (taskIds != null) {
+            for (Long taskId : taskIds) {
+                TaskInfo taskInfo = state.getTasks().get(taskId);
+                if (taskInfo.getStatus() == TaskInfo.TaskStatus.FINISHED) {
+                    taskInfo.setStatus(TaskInfo.TaskStatus.KILLED);
+                }
+            }
+        }
+
         if (isTopologyKilled(cmd.getTopologyId())) {
             killTopology(cmd.getTopologyId());
             return;
@@ -656,7 +677,21 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
         Topology topology = state.getTopologys().get(topologyId);
         topology.setState(Topology.TopologyState.PREPARING);
 
-        scheduleTopology(topology);
+        try {
+            scheduleTopology(topology);
+        }
+        catch (Exception e) {
+            // schedule异常，直接结束作业
+            state.getTopologys().remove(topologyId);
+            if (getClientRef() != null) {
+                getClientRef().tell(new TopologyFinished(topologyId, new ArrayList<TaskInfo>(), SerializationUtils.serialize(e.getMessage())), getSelf());
+            }
+            if (getLeaderMonitor() != null) {
+                getLeaderMonitor().tell(new LeaderStateUpdated(state), getSelf());
+            }
+
+            return;
+        }
 
         takeSnapshot(SerializationUtils.clone(state), new Procedure<Serializable>() {
             @Override
@@ -668,12 +703,35 @@ public class ReactiveLeader extends PersistentReactiveComponent implements ILead
 
     public void onSubmitTopology(SubmitTopology command) {
         final Topology topology = command.getTopology();
+        String jobId = topology.getTopologyId().getTopologyId();
+        for (GlobalTopologyId topologyId : state.getTopologys().keySet()) {
+            if (topologyId.getTopologyId().equals(jobId)) {
+                if (getClientRef() != null) {
+                    // 有作业还没结束，直接结束本次运行
+                    getClientRef().tell(new TopologyFinished(topology.getTopologyId(), new ArrayList<TaskInfo>(), SerializationUtils.serialize("异常结束，因为作业[" + topologyId + "]正在运行。")), getSelf());
+                    return;
+                }
+            }
+        }
+
         topology.setState(Topology.TopologyState.INIT);
         state.getTopologys().put(topology.getTopologyId(), topology);
         takeSnapshot(SerializationUtils.clone(state), new Procedure<Serializable>() {
             @Override
             public void apply(Serializable param) {
                 getSender().tell(new TopologySubmitted(topology), getSelf());
+            }
+        });
+    }
+
+    public void onResetLeader() {
+        state = new LeaderState();
+        takeSnapshot(state, new Procedure<Serializable>() {
+            @Override
+            public void apply(Serializable param) throws Exception {
+                if (getLeaderMonitor() != null) {
+                    getLeaderMonitor().tell(new LeaderStateUpdated(state), getSelf());
+                }
             }
         });
     }
