@@ -1,5 +1,8 @@
 package io.reactivej.dcf.common.topology.client;
 
+import io.reactivej.dcf.common.protocol.acker.RemoveAckerMonitor;
+import io.reactivej.dcf.common.protocol.acker.RemoveAckerTopology;
+import io.reactivej.dcf.common.protocol.acker.SetAckerMonitor;
 import io.reactivej.dcf.common.protocol.leader.*;
 import io.reactivej.dcf.common.protocol.worker.RemoveWorkerMonitor;
 import io.reactivej.dcf.common.protocol.worker.SetWorkerMonitor;
@@ -20,6 +23,7 @@ public class DCFManager {
     private ReactiveRef endpoint;
 
     private boolean monitoringLeader;
+    private boolean monitoringAcker;
     private List<String> monitoringWorkers = new ArrayList<>();
     private List<GlobalTopologyId> monitoringTopologys = new ArrayList<>();
 
@@ -42,6 +46,10 @@ public class DCFManager {
         return monitoringLeader;
     }
 
+    public boolean isMonitoringAcker() {
+        return monitoringAcker;
+    }
+
     public void startMonitorLeader() {
         monitoringLeader = true;
         endpoint.tell(new SetLeaderMonitor(), null);
@@ -50,6 +58,16 @@ public class DCFManager {
     public void endMonitorLeader() {
         monitoringLeader = false;
         endpoint.tell(new RemoveLeaderMonitor(), null);
+    }
+
+    public void startMonitorAcker() {
+        monitoringAcker = true;
+        endpoint.tell(new SetAckerMonitor(), null);
+    }
+
+    public void endMonitorAcker() {
+        monitoringAcker = false;
+        endpoint.tell(new RemoveAckerMonitor(), null);
     }
 
     public void submitTopology(Topology topology) {
@@ -90,5 +108,13 @@ public class DCFManager {
     public void endMonitorTopology(GlobalTopologyId globalTopologyId) {
         this.monitoringTopologys.remove(globalTopologyId);
         endpoint.tell(new RemoveTopologyMonitor(globalTopologyId), null);
+    }
+
+    public void resetLeader() {
+        endpoint.tell(new ResetLeader(), null);
+    }
+
+    public void removeAckerTopology(GlobalTopologyId id) {
+        endpoint.tell(new RemoveAckerTopology(id), null);
     }
 }

@@ -1,5 +1,9 @@
 package io.reactivej.dcf.common.topology.client;
 
+import io.reactivej.dcf.common.protocol.acker.AckerInfoUpdated;
+import io.reactivej.dcf.common.protocol.acker.RemoveAckerMonitor;
+import io.reactivej.dcf.common.protocol.acker.RemoveAckerTopology;
+import io.reactivej.dcf.common.protocol.acker.SetAckerMonitor;
 import io.reactivej.dcf.common.protocol.leader.*;
 import io.reactivej.dcf.common.protocol.task.TaskStateUpdated;
 import io.reactivej.dcf.common.protocol.worker.RemoveWorkerMonitor;
@@ -59,10 +63,10 @@ public class DCFEndpoint extends ReactiveComponent {
                 } else if (msg instanceof TopologyStarted) {
                     listener.onTopologyStarted(((TopologyStarted) msg).getTopology());
                 } else if (msg instanceof TopologyKilled) {
-                    listener.onTopologyKilled(((TopologyKilled) msg).getTopology());
+                    listener.onTopologyKilled(((TopologyKilled) msg).getTopologyId(), ((TopologyKilled) msg).getTopologyTasks());
                 } else if (msg instanceof TopologyFinished) {
                     Serializable result = SerializeUtil.deserialize(((TopologyFinished) msg).getResult(), getContext().getSystem().getSystemClassLoader());
-                    listener.onTopologyFinished(((TopologyFinished) msg).getTopology(), result);
+                    listener.onTopologyFinished(((TopologyFinished) msg).getTopologyId(), ((TopologyFinished) msg).getTopologyTasks(), result);
                 } else if (msg instanceof LeaderStateUpdated) {
                     listener.onLeaderStateUpdated(((LeaderStateUpdated) msg).getState());
                 } else if (msg instanceof LeaderInfoUpdated) {
@@ -86,6 +90,15 @@ public class DCFEndpoint extends ReactiveComponent {
                 } else if (msg instanceof TopologyMessage) {
                     Serializable message = SerializeUtil.deserialize(((TopologyMessage) msg).getMessage(),  getContext().getSystem().getSystemClassLoader());
                     listener.onTopologyMessage(((TopologyMessage) msg).getTopologyId(), message);
+                } else if (msg instanceof ResetLeader) {
+                    clusterClient.tell(new ClusterClient.ClusterMessage("leader", msg), getSelf());
+                } else if (msg instanceof SetAckerMonitor ||
+                        msg instanceof RemoveAckerMonitor) {
+                    clusterClient.tell(new ClusterClient.ClusterMessage("acker", msg), getSelf());
+                } else if (msg instanceof AckerInfoUpdated) {
+                    listener.onAckerInfoUpdated(((AckerInfoUpdated) msg).getInfo());
+                } else if (msg instanceof RemoveAckerTopology) {
+                    clusterClient.tell(new ClusterClient.ClusterMessage("acker", msg), getSelf());
                 }
             }
         };

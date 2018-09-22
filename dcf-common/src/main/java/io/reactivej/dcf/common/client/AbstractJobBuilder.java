@@ -5,6 +5,7 @@ import io.reactivej.dcf.common.topology.IComponentDescription;
 import io.reactivej.dcf.common.topology.Topology;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +25,35 @@ public abstract class AbstractJobBuilder implements IJobBuilder {
 
     public Topology createJobTopology(Map<String, String> params) {
         Topology topology = createJobTopology();
-        Map<String, String> defaultParams = getJobDefaultParameters();
+        return configJobTopology(topology, params);
+    }
 
+    @Override
+    public Map<String, String> getJobDefaultParameters() {
+        Map<String, String> defaultParams = new HashMap<String, String>();
+
+        defaultParams.put(tupleTimeoutKey, "300000000000");
+        defaultParams.put(tupleQueueSizeLowKey, "500");
+        defaultParams.put(tupleQueueSizeHighKey, "800");
+
+        return defaultParams;
+    }
+
+    private void mergeMap(Map<String, String> target, Map<String, String> conf) {
+        for (Map.Entry<String, String> e : conf.entrySet()) {
+            String k = e.getKey();
+            if (target.get(k) == null) {
+                target.put(k, e.getValue());
+            }
+        }
+    }
+
+    @Override
+    public Topology configJobTopology(Topology topology, Map<String, String> params) {
+        // 和默认值进行合并
+        mergeMap(params, getJobDefaultParameters());
+
+        // 设置所有job的通用属性
         for (String compName : topology.getDag().getComponents().keySet()) {
             String memKey = compName + memorySuffix;
             String coreKey = compName + coreSuffix;
@@ -33,11 +61,11 @@ public abstract class AbstractJobBuilder implements IJobBuilder {
             String threadKey = compName + threadSuffix;
             String locKey = compName + locationSuffix;
 
-            String memStr = params.get(memKey) != null ? params.get(memKey) : defaultParams.get(memKey);
-            String coreStr = params.get(coreKey) != null ? params.get(coreKey) : defaultParams.get(coreKey);
-            String paralStr = params.get(paralKey) != null ? params.get(paralKey) : defaultParams.get(paralKey);
-            String threadStr = params.get(threadKey) != null ? params.get(threadKey) : defaultParams.get(threadKey);
-            String locStr = params.get(locKey) != null ? params.get(locKey) : defaultParams.get(locKey);
+            String memStr = params.get(memKey);
+            String coreStr = params.get(coreKey);
+            String paralStr = params.get(paralKey);
+            String threadStr = params.get(threadKey);
+            String locStr = params.get(locKey);
 
             IComponentDescription compDefine = topology.getDag().getComponent(compName);
 
@@ -60,43 +88,34 @@ public abstract class AbstractJobBuilder implements IJobBuilder {
                 Integer thread = Integer.parseInt(threadStr);
                 topology.getThreadParallelism().put(compName, thread);
             }
+
+            params.remove(memKey);
+            params.remove(coreKey);
+            params.remove(paralKey);
+            params.remove(threadKey);
+            params.remove(locKey);
         }
 
-        String tupleTimeoutStr = params.get(tupleTimeoutKey) != null ? params.get(tupleTimeoutKey) :
-                defaultParams.get(tupleTimeoutKey);
-
+        String tupleTimeoutStr = params.get(tupleTimeoutKey);
         if (tupleTimeoutStr != null) {
             topology.setTupleTimeout(Long.parseLong(tupleTimeoutStr));
         }
-        else {
-            topology.setTupleTimeout(300000000000L);
-        }
 
-        String tupleQueueSizeLowStr = params.get(tupleQueueSizeLowKey) != null ? params.get(tupleQueueSizeLowKey) :
-                defaultParams.get(tupleQueueSizeLowKey);
-
+        String tupleQueueSizeLowStr = params.get(tupleQueueSizeLowKey);
         if (tupleQueueSizeLowStr != null) {
             topology.setTupleQueueSizeLow(Integer.parseInt(tupleQueueSizeLowStr));
         }
-        else {
-            topology.setTupleQueueSizeLow(500);
-        }
 
-        String tupleQueueSizeHighStr = params.get(tupleQueueSizeHighKey) != null ? params.get(tupleQueueSizeHighKey) :
-                defaultParams.get(tupleQueueSizeHighKey);
-
+        String tupleQueueSizeHighStr = params.get(tupleQueueSizeHighKey);
         if (tupleQueueSizeHighStr != null) {
             topology.setTupleQueueSizeHigh(Integer.parseInt(tupleQueueSizeHighStr));
         }
-        else {
-            topology.setTupleQueueSizeHigh(800);
-        }
 
-        return configJobTopology(topology, params);
-    }
+        params.remove(tupleTimeoutKey);
+        params.remove(tupleQueueSizeLowKey);
+        params.remove(tupleQueueSizeHighKey);
 
-    @Override
-    public Topology configJobTopology(Topology topology, Map<String, String> params) {
+        // 其他属性按照String类型先储存
         for (String k: params.keySet()) {
             topology.getConfig().put(k, params.get(k));
         }

@@ -14,7 +14,7 @@ import io.reactivej.dcf.common.topology.*;
  * 
  * @Description: DAG构建器 基于 DAG的顶点（component）构建一个DAG，包括顶点和DAG上的一条通路
  * 
- * @author heartup@gmail.com
+ * @author: Wang Xiao Tian
  * 
  * @date: 2015年8月13日 上午9:51:38
  */
