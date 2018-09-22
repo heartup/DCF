@@ -7,7 +7,7 @@ import io.reactivej.dcf.common.protocol.tuple.ReceiveTuple;
 import io.reactivej.dcf.common.protocol.tuple.TupleProcessed;
 
 /**
- * @author heartup@gmail.com on 8/7/16.
+ * Created by heartup@gmail.com on 8/7/16.
  */
 public interface ITask {
 

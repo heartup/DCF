@@ -196,7 +196,7 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
         heartbeatMsg.setTasks(tasks);
 
         clusterClient.tell(new ClusterClient.ClusterMessage("leader",
-                heartbeatMsg), getSelf());
+                        heartbeatMsg), getSelf());
 
         if (getMonitor() != null) {
             getMonitor().tell(new WorkerStateUpdated(state), getSelf());
@@ -210,8 +210,8 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
 
         boolean shouldKill = true;
         for (List<Long> ts : state.getLocalTopologyTasks().values()) {
-            if (ts.contains(info.getTaskId()))
-                shouldKill = false;
+           if (ts.contains(info.getTaskId()))
+               shouldKill = false;
         }
 
         if (shouldKill) {

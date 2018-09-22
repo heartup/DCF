@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 
 /**
- * Created by heartup@gmail.com1 on 2017/2/8.
+ * Created by heartup@gmail.com on 2017/2/8.
  */
 public class WorkerSupervisor extends ClusterRootComponent {
 
@@ -20,6 +20,8 @@ public class WorkerSupervisor extends ClusterRootComponent {
 
     @Override
     public void onSupervise(SystemMessage msg) {
+        super.onSupervise(msg);
+
         if (msg instanceof Failure) {
             logger.error("", ((Failure) msg).getCause());
             Throwable cause = ((Failure) msg).getCause();
@@ -31,10 +33,6 @@ public class WorkerSupervisor extends ClusterRootComponent {
                     ReactiveWorker worker = (ReactiveWorker) getContext().getChild("worker").getCell().getComponent();
                     worker.setMonitor(null);
                 }
-            }
-            else {
-                getClusterClient().tell(new ClusterClient.ClusterMessage("leader",
-                        new FailMessage(SerializationUtils.serialize(msg))), getSelf());
             }
         }
     }

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author heartup@gmail.com on 4/6/16.
+ * Created by heartup@gmail.com on 4/6/16.
  */
 public class ProcessTaskManager extends ReactiveComponent {
     Logger logger = LoggerFactory.getLogger(ProcessTaskManager.class);

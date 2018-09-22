@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author heartup@gmail.com on 8/6/16.
+ * Created by heartup@gmail.com on 8/6/16.
  */
 public class TupleHandler extends ReactiveComponent {
     private static Logger logger = LoggerFactory.getLogger(TupleHandler.class);

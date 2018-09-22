@@ -19,6 +19,7 @@ import io.reactivej.persist.RecoveryComplete;
 import io.reactivej.persist.SnapshotOffer;
 import io.reactivej.dcf.common.topology.*;
 import io.reactivej.dcf.common.util.ConsistentHashUtil;
+import io.reactivej.dcf.common.util.SerializeUtil;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * @author heartup@gmail.com on 8/6/16.
+ * Created by heartup@gmail.com on 8/6/16.
  */
 public class ReactiveTask extends PersistentReactiveComponent implements ITask, ITopologyContext {
     private static Logger logger = LoggerFactory.getLogger(ReactiveTask.class);
