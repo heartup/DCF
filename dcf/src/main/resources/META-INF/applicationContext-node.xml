@@ -57,4 +57,9 @@
 		<constructor-arg index="1" value="node"/>
 	</bean>
 
+	<bean id="logServer" class="io.reactivej.dcf.node.log.LogServer" init-method="start" destroy-method="stop">
+		<constructor-arg value="9000"/>
+		<constructor-arg value="/export/logs/wycds-jobworker/" />
+	</bean>
+
 </beans>
