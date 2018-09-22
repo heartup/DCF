@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 
 /**
- * Created by heartup@gmail.com1 on 2017/2/8.
+ * Created by heartup@gmail.com on 2017/2/8.
  */
 public class LeaderSupervisor extends ClusterRootComponent {
 
@@ -19,6 +19,8 @@ public class LeaderSupervisor extends ClusterRootComponent {
 
     @Override
     public void onSupervise(SystemMessage msg) {
+        super.onSupervise(msg);
+
         if (msg instanceof Failure) {
             logger.error("", ((Failure) msg).getCause());
             Throwable cause = ((Failure) msg).getCause();
@@ -41,10 +43,6 @@ public class LeaderSupervisor extends ClusterRootComponent {
                     ReactiveLeader leader = (ReactiveLeader) getContext().getChild("leader").getCell().getComponent();
                     leader.setTaskMonitor(null);
                 }
-            }
-            else {
-                getClusterClient().tell(new ClusterClient.ClusterMessage("leader",
-                        new FailMessage(SerializationUtils.serialize(msg))), getSelf());
             }
         }
     }
