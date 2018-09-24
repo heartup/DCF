@@ -83,7 +83,7 @@
 
 
                 <mvn.task.port.min>7005</mvn.task.port.min>
-                <mvn.task.port.max>7100</mvn.task.port.max>
+                <mvn.task.port.max>7150</mvn.task.port.max>
 
                 <mvn.task.debug>true</mvn.task.debug>
 
