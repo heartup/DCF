@@ -70,7 +70,7 @@
 
                 <mvn.node.port>7001</mvn.node.port>
 
-                <mvn.leader.host>172.27.0.7</mvn.leader.host>
+                <mvn.leader.host>127.0.0.1</mvn.leader.host>
                 <mvn.leader.port>7002</mvn.leader.port>
                 <mvn.leader.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18001,server=y,suspend=n</mvn.leader.java.debug>
                 <mvn.leader.java.xms>100</mvn.leader.java.xms>
@@ -82,18 +82,18 @@
                 <mvn.worker.java.xmx>200</mvn.worker.java.xmx>
 
 
-                <mvn.task.port.min>7005</mvn.task.port.min>
-                <mvn.task.port.max>7150</mvn.task.port.max>
+                <mvn.task.port.min>7010</mvn.task.port.min>
+                <mvn.task.port.max>7100</mvn.task.port.max>
 
                 <mvn.task.debug>true</mvn.task.debug>
 
-                <mvn.acker.host>172.27.0.15</mvn.acker.host>
+                <mvn.acker.host>127.0.0.1</mvn.acker.host>
                 <mvn.acker.port>7004</mvn.acker.port>
                 <mvn.acker.java.debug>-Xdebug -Xnoagent -Dfile.encoding=UTF-8 -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=18004,server=y,suspend=n</mvn.acker.java.debug>
                 <mvn.acker.java.xms>200</mvn.acker.java.xms>
                 <mvn.acker.java.xmx>1000</mvn.acker.java.xmx>
 
-                <mvn.heartbeat.interval>10000</mvn.heartbeat.interval>
+                <mvn.heartbeat.interval>5000</mvn.heartbeat.interval>
             </properties>
             <build>
                 <plugins>

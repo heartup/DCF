@@ -97,7 +97,7 @@ public class ReactiveWorker extends PersistentReactiveComponent implements IWork
 
         WorkerRegister registerMsg = new WorkerRegister(id, getContext().getSystem().getHost(),
                 getContext().getSystem().getPort(), 4, 8000);
-        SortedSet<Integer> ports = SocketUtils.findAvailableTcpPorts(100, SystemConfig.getIntValue(SystemConfig.task_port_min), SystemConfig.getIntValue(SystemConfig.task_port_max));
+        SortedSet<Integer> ports = SocketUtils.findAvailableTcpPorts(20, SystemConfig.getIntValue(SystemConfig.task_port_min), SystemConfig.getIntValue(SystemConfig.task_port_max));
         registerMsg.getAvailablePort().addAll(ports);
 
         state.getWorkerInfo().getAvailablePort().clear();
