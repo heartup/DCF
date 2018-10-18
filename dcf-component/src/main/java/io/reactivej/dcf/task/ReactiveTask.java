@@ -93,9 +93,9 @@ public class ReactiveTask extends PersistentReactiveComponent implements ITask, 
                 if (theTuple.getRootIds().size() > 0) {
                     // 告知emitter，tuple处理fail
                     clusterClient.tell(new ClusterClient.ClusterMessage("acker",
-                            new FailTuple(state.getTopology().getTopologyId(), theTuple.getRootIds(),
-                                    SerializationUtils.serialize(theTuple),
-                                    SerializationUtils.serialize(((Failure) msg).getCause()))),
+                                    new FailTuple(state.getTopology().getTopologyId(), theTuple.getRootIds(),
+                                            SerializationUtils.serialize(theTuple),
+                                            SerializationUtils.serialize(((Failure) msg).getCause()))),
                             getSelf());
                 }
             }
@@ -290,8 +290,8 @@ public class ReactiveTask extends PersistentReactiveComponent implements ITask, 
             state.getTaskInfo().getTupleInfo().setFailed(failed + 1);
 
             if (msg.getTuple() != null) {
-                ReactiveRef tupleHandler = getContext().createChild("fail-" + UUID.randomUUID().toString(), true, TupleHandler.class.getName(), this.state.getExecutableComponent());
-                tupleHandler.tell(msg, getSelf());
+//                ReactiveRef tupleHandler = getContext().createChild("fail-" + UUID.randomUUID().toString(), true, TupleHandler.class.getName(), this.state.getExecutableComponent());
+                ackChildRef.tell(msg, getSelf());
             }
         }
     }
