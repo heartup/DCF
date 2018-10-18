@@ -11,6 +11,7 @@ import io.reactivej.dcf.common.init.SystemConfig;
 import io.reactivej.AbstractComponentBehavior;
 import io.reactivej.ReactiveComponent;
 import io.reactivej.SystemMessage;
+import io.reactivej.util.HostUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,14 +34,19 @@ public class ReactiveNode extends ReactiveComponent implements INode {
     public void preStart() {
         super.preStart();
         // 启动Leader和Worker进程
-        leaderProcess = ContainerFactory.createJavaProcessContainer(createLeaderProcParams());
-        workerProcess = ContainerFactory.createJavaProcessContainer(createWorkerProcParams());
-        ackerProcess = ContainerFactory.createJavaProcessContainer(createAckerProcParams());
-
         try {
-            leaderProcess.startContainer();
+            workerProcess = ContainerFactory.createJavaProcessContainer(createWorkerProcParams());
             workerProcess.startContainer();
-            ackerProcess.startContainer();
+
+            String localIp = HostUtil.getSuitLocalAddress();
+            if (localIp.equals(SystemConfig.getValue(SystemConfig.leader_host))) {
+                leaderProcess = ContainerFactory.createJavaProcessContainer(createLeaderProcParams());
+                leaderProcess.startContainer();
+            }
+            if (localIp.equals(SystemConfig.getValue(SystemConfig.acker_host))) {
+                ackerProcess = ContainerFactory.createJavaProcessContainer(createAckerProcParams());
+                ackerProcess.startContainer();
+            }
         } catch (IOException e) {
             logger.error("启动失败", e);
             throw new RuntimeException("启动失败", e);
